@@ -168,6 +168,11 @@ nav.navigation {
     color: #2e7d32;
 }
 
+.tag-graphics {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
 .nav-blog {
     margin-top: 20px;
     text-align: center;
