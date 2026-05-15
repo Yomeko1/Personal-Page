@@ -1,0 +1,261 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.profile-section .avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 0 auto 20px;
+}
+
+header.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+header.hero .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+nav.navigation {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-list a {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    padding: 15px 0;
+    display: block;
+    transition: color 0.3s;
+}
+
+.nav-list a:hover,
+.nav-list a.active {
+    color: #667eea;
+}
+
+.main-content {
+    padding: 40px 0;
+    min-height: calc(100vh - 200px);
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card p {
+    margin-bottom: 10px;
+}
+
+.interest-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.interest-list li {
+    padding: 10px 15px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+
+.blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.blog-card {
+    border-left: 4px solid #667eea;
+}
+
+.blog-card h3 {
+    font-size: 1.4rem;
+    margin: 10px 0;
+}
+
+.blog-card p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.tag-math {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.nav-blog {
+    margin-top: 20px;
+    text-align: center;
+}
+
+header.blog-hero {
+    padding: 40px 0;
+    text-align: left;
+}
+
+header.blog-hero .container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+header.blog-hero h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.blog-content .card {
+    margin-bottom: 20px;
+}
+
+.blog-content .card h2 {
+    font-size: 1.5rem;
+    margin: 25px 0 15px;
+    color: #667eea;
+}
+
+.blog-content .card h2:first-child {
+    margin-top: 0;
+}
+
+.blog-content .card h3 {
+    font-size: 1.2rem;
+    margin: 20px 0 10px;
+    color: #333;
+}
+
+.blog-content .card p {
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+.blog-content .card ul {
+    margin: 10px 0 15px 20px;
+}
+
+.blog-content .card li {
+    margin-bottom: 8px;
+}
+
+footer.footer {
+    text-align: center;
+    padding: 40px;
+}
+
+.blog-preview h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.blog-preview p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #764ba2;
+}
+
+footer.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+    header.hero {
+        padding: 40px 0;
+    }
+
+    header.hero h1 {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .nav-list {
+        gap: 20px;
+    }
+
+    .interest-list {
+        grid-template-columns: 1fr;
+    }
+}
