@@ -27,10 +27,20 @@
     <main class="main-content blog-content">
         <article class="container">
             <div class="card">
+                <h2>目录</h2>
+                <ul class="toc">
+                    <li><a href="#section1">1. 光栅化渲染</a></li>
+                    <li><a href="#section2">2. 光线追踪</a></li>
+                    <li><a href="#section3">3. 路径追踪与俄罗斯轮盘赌</a></li>
+                    <li><a href="#section4">4. 性能对比：为何开光追会卡顿？</a></li>
+                    <li><a href="#section5">5. 现代游戏的混合方案</a></li>
+                    <li><a href="#section6">6. 总结</a></li>
+                </ul>
+
                 <h2>引言</h2>
                 <p>在现代游戏的设置菜单中，我们经常能看到"光线追踪"（Ray Tracing）这个选项。开启后，画面会更逼真——倒影更清晰、阴影更自然、间接光照更柔和。然而，很多玩家的电脑却因此出现帧数下降、运行卡顿的现象。这是为什么？本文将从光栅化渲染出发，系统介绍两种不同的渲染方式，以及它们对硬件算力要求的差异。</p>
 
-                <h2>1. 光栅化渲染（Rasterization）</h2>
+                <h2 id="section1">1. 光栅化渲染（Rasterization）</h2>
                 <p>光栅化是自 1990 年代起就广泛使用的传统渲染方式，也是目前大多数游戏默认的渲染管线。它的核心思想是：将 3D 场景投影到 2D 屏幕上，逐像素确定颜色。</p>
 
                 <h3>1.1 渲染管线流程</h3>
@@ -56,17 +66,13 @@
 
                 <h3>1.3 光栅化原理：扫描线算法</h3>
                 <p>光栅化的核心是确定每个三角形覆盖了哪些像素。最常用的方法是<strong>扫描线算法</strong>。对于屏幕上的每个水平扫描线，计算它与三角形的相交区间，然后填充区间内的像素。</p>
-                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
-                    <p style="color: #666;">[示意图：扫描线光栅化过程，三角形被分解为水平像素行]</p>
-                </div>
+                <img src="Image/扫描线算法示意图.jpg" alt="扫描线算法示意图" class="blog-image">
 
                 <h3>1.4 GPU 并行架构</h3>
                 <p>GPU 之所以能高效处理光栅化，得益于其<strong>大规模并行架构</strong>。一块主流显卡可能拥有数千个流处理器（Stream Processors），每个处理器可以同时处理一个像素的计算。这意味着整个屏幕的百万级像素可以被"同时"计算，大幅缩短了总处理时间。</p>
-                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
-                    <p style="color: #666;">[示意图：GPU 并行处理示意，数千个核心同时计算不同像素]</p>
-                </div>
+                <img src="Image/GPU并行示意图.png" alt="GPU并行示意图" class="blog-image">
 
-                <h2>2. 光线追踪（Ray Tracing）</h2>
+                <h2 id="section2">2. 光线追踪（Ray Tracing）</h2>
                 <p>光线追踪的灵感来自对现实世界中光线行为的模拟。在现实中，光从光源发出，经过多次反射、折射后进入我们的眼睛。光线追踪正是逆向计算这一过程：从屏幕每个像素出发，向场景中发射光线，追踪它与物体相交后的反射、折射路径，最终计算像素颜色。</p>
 
                 <h3>2.1 光线方程</h3>
@@ -92,9 +98,7 @@
                     <li>若 Δ < 0：无交点</li>
                     <li>若 Δ ≥ 0：取较小的非负根作为交点距离 t</li>
                 </ul>
-                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
-                    <p style="color: #666;">[示意图：光线与球体求交，交点处可计算法线、反射方向等]</p>
-                </div>
+                <p>光线与球体求交的几何意义是：求解光线与球面方程的交点。当光线穿越球体时，会在入口和出口处各产生一个交点，取距离较近的入口点作为实际交点。</p>
 
                 <h3>2.3 光线与三角形求交</h3>
                 <p>实际场景中更多使用三角形面片。光线和三角形 ABC 求交的步骤：</p>
@@ -141,21 +145,54 @@
                     η₁ sin(θ₁) = η₂ sin(θ₂)<br>
                     t = (η₁/η₂)d - n·((η₁/η₂)cos(θ₁) - cos(θ₂))
                 </div>
-                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
-                    <p style="color: #666;">[示意图：光线在镜面反射，左为入射光线，右为反射光线]</p>
-                </div>
 
                 <h3>2.5 BVH 加速结构</h3>
                 <p>直接对场景中每个物体测试光线求交，计算复杂度为 O(N)。为加速这一过程，通常使用 <strong>BVH（Bounding Volume Hierarchy）</strong>——用层次化的包围盒跳过不必要的求交测试。</p>
-                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
-                    <p style="color: #666;">[示意图：BVH 树结构，复杂模型被层次化包围盒包裹]</p>
-                </div>
+                <img src="Image/BVH树.jpg" alt="BVH加速结构示意图" class="blog-image">
                 <p>BVH 将场景物体组织成树结构：根节点包围整个场景，叶节点是单个物体。求交时从根节点开始，如果光线与某包围盒无交，则跳过该节点下的所有子节点。平均可将复杂度降至 O(log N)。</p>
 
-                <h2>3. 性能对比：为何开光追会卡顿？</h2>
+                <h2 id="section3">3. 路径追踪与俄罗斯轮盘赌</h2>
+                <p>前面介绍的是确定性光线追踪（Deterministic Ray Tracing），它追踪的是固定的光线路径。但在实际中，真实的光线行为具有随机性——光线从光源发出后，可能经过任意次数的反射、折射、散射后才进入摄影机或被完全吸收。这种随机性使得传统光追难以准确模拟全局光照效果。</p>
+
+                <h3>3.1 路径追踪（Path Tracing）</h3>
+                <p><strong>路径追踪</strong>是一种基于蒙特卡罗方法的渲染技术。它的核心思想是：用随机采样模拟光线的随机传播路径，然后用<strong>大数定律</strong>将采样结果收敛到真实的解。</p>
+                <p>对于每个像素，路径追踪的采样公式为：</p>
+                <div class="formula">
+                    <strong>光照贡献公式：</strong><br>
+                    L_o(p, ω_o) = ∫_Ω f_r(p, ω_i, ω_o) L_i(p, ω_i) cos(θ_i) dω_i<br>
+                    <br>
+                    其中 f_r 是双向反射分布函数（BRDF），L_i 是入射光照，cos(θ_i) 是入射角因子。<br>
+                    <br>
+                    由于积分无法解析求解，我们用蒙特卡罗方法估计：<br>
+                    L ≈ (1/N) Σ (f_r · L_i · cos(θ) / p(ω))
+                </div>
+                <p>这里的 p(ω) 是采样概率分布。通过多次采样平均，最终结果会收敛到真实的光照值。采样次数 N 越大，噪声越小，画面越平滑。</p>
+
+                <h3>3.2 俄罗斯轮盘赌（Russian Roulette）</h3>
+                <p>在路径追踪中，光线可以无限弹射（光线在光滑表面会不断反射永不终止）。为避免无限循环，我们需要在某个深度终止递归。但简单的深度截断会引入偏差——因为它系统性地遗漏了长路径的光线贡献。</p>
+                <p><strong>俄罗斯轮盘赌</strong>是一种无偏的终止策略：每当光线追踪到一定深度时，以某个概率 p 决定是否继续追踪。如果终止，则返回一个启发式估计值；如果继续，则对光线进行加权补偿，使得终止与非终止情况的期望值一致。</p>
+                <div class="formula">
+                    <strong>俄罗斯轮盘赌算法：</strong><br>
+                    <br>
+                    <strong>RussianRoulette(depth, p_terminate):</strong><br>
+                    &nbsp;&nbsp;if depth > MIN_DEPTH:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;if random() < p_terminate:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return ESTIMATED_INDIRECT_LIGHT<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;else:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;weight = 1 / (1 - p_terminate)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return TraceRay() * weight<br>
+                    &nbsp;&nbsp;else:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;return TraceRay()<br>
+                    <br>
+                    终止概率 p_terminate 通常取 0.3-0.5。<br>
+                    ESTIMATED_INDIRECT_LIGHT 可以是环境光平均值或 0。
+                </div>
+                <p>俄罗斯轮盘赌的关键是<strong>加权补偿</strong>：当光线被终止时，我们不返回 0，而是返回一个合理的估计值；当光线继续追踪时，我们用 (1 - p_terminate) 的倒数作为权重放大最终结果。这保证了无论光线是否终止，最终期望值都等于真实值，从而实现无偏估计。</p>
+
+                <h2 id="section4">4. 性能对比：为何开光追会卡顿？</h2>
                 <p>了解了两种渲染方式后，我们来分析为什么开启光线追踪后电脑会变卡。</p>
 
-                <h3>3.1 计算量分析</h3>
+                <h3>4.1 计算量分析</h3>
                 <p>光栅化每个像素的计算是<strong>独立的、固定流程的</strong>，GPU 可以批量并行处理。而光线追踪的计算量是<strong>动态且递归的</strong>：</p>
                 <ul>
                     <li>每个像素需要发射多条光线（主光线 + 反射光 + 阴影光）</li>
@@ -175,19 +212,16 @@
                     <br>
                     每次求交需解二次方程（光线-球体）或重心坐标计算（光线-三角形）
                 </div>
-                <p>这还没有考虑每个物体包含数万三角形的复杂场景。</p>
+                <p>对于路径追踪，计算量更大：由于需要多次采样来收敛噪声，每个像素需要采样数十甚至数百次，每次采样都执行完整的光线追踪路径。</p>
 
-                <h3>3.2 光线追踪的瓶颈</h3>
+                <h3>4.2 光线追踪的瓶颈</h3>
                 <p>光栅化可以充分利用 GPU 的并行特性，但光线追踪存在两个主要瓶颈：</p>
                 <ol>
                     <li><strong>内存带宽瓶颈</strong>：每次求交测试需要读取场景几何数据（三角形顶点、材质信息），而 GPU 缓存难以有效预取这些数据，导致内存访问延迟成为瓶颈</li>
                     <li><strong>分支不确定性</strong>：不同像素追踪的光线数不同（遇到反射材质继续追踪，遇到吸收材质停止），导致 GPU 流处理器执行路径不一致，难以高效并行</li>
                 </ol>
-                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
-                    <p style="color: #666;">[示意图：光追计算量随弹射次数指数增长示意图]</p>
-                </div>
 
-                <h2>4. 现代游戏的混合方案</h2>
+                <h2 id="section5">5. 现代游戏的混合方案</h2>
                 <p>既然光线追踪这么好，为什么不全程使用？因为完整光线追踪的计算量对于实时渲染（每秒 60 帧）来说仍然过大。目前主流的做法是<strong>混合渲染</strong>：</p>
                 <ul>
                     <li><strong>光栅化作为基础</strong>：用光栅化渲染大部分画面，保证基本帧率</li>
@@ -195,12 +229,10 @@
                     <li><strong>降噪算法</strong>：每像素只投射少量光线（如 1-2 条），用 AI 降噪从少样本生成高质量结果</li>
                 </ul>
                 <p>例如 NVIDIA 的 <strong>DLSS</strong>（Deep Learning Super Sampling）技术：先以较低分辨率（如 720p）渲染，再用 AI 网络重建为高分辨率（如 1080p）画面，同时执行降噪处理。这使得光追性能提升 2-4 倍。</p>
-                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
-                    <p style="color: #666;">[对比图：左侧关闭光追的光栅化画面，右侧开启光追+DLSS的画面]</p>
-                </div>
 
-                <h2>5. 总结</h2>
+                <h2 id="section6">6. 总结</h2>
                 <p>光线追踪代表了计算机图形学的未来，它能带来更加逼真的画面效果。其背后的数学原理——光线参数方程、球体求交的二次方程、反射与折射公式——构成了这套渲染范式的理论基础。</p>
+                <p><strong>路径追踪</strong>通过蒙特卡罗采样和大数定律，将随机性的光线传播问题转化为可计算的积分估计；而<strong>俄罗斯轮盘赌</strong>则提供了一种无偏的无限弹射终止策略。</p>
                 <p>然而，光线追踪巨大的计算量仍是实时的挑战。每个像素需要追踪多条弹跳光线，而每条光线都需要与场景几何进行求交测试，这种指数级增长是光追卡顿的根本原因。</p>
                 <p>目前游戏采用的光栅+光追混合方案是在效果与性能间的折中。随着硬件算力提升和 AI 降噪技术发展，我们有理由相信，未来光线追踪将成为游戏渲染的默认方式。</p>
             </div>

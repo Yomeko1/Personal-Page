@@ -246,6 +246,35 @@ header.blog-hero h1 {
     border-radius: 8px;
 }
 
+.toc {
+    list-style: none;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px 30px;
+    margin: 20px 0;
+}
+
+.toc li {
+    margin-bottom: 8px;
+}
+
+.toc a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.toc a:hover {
+    text-decoration: underline;
+}
+
+.blog-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 8px;
+}
+
 footer.footer {
     text-align: center;
     padding: 40px;
