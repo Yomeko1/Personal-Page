@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>从光栅到光追：游戏显卡的算力消耗解析 - 个人主页</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <header class="hero blog-hero">
@@ -39,6 +41,7 @@
 
                 <h2>引言</h2>
                 <p>在现代游戏的设置菜单中，我们经常能看到"光线追踪"（Ray Tracing）这个选项。开启后，画面会更逼真——倒影更清晰、阴影更自然、间接光照更柔和。然而，很多玩家的电脑却因此出现帧数下降、运行卡顿的现象。这是为什么？本文将从光栅化渲染出发，系统介绍两种不同的渲染方式，以及它们对硬件算力要求的差异。</p>
+                <p class="image-notice">图片来源于网络，如有侵权请联系作者删除。</p>
 
                 <h2 id="section1">1. 光栅化渲染（Rasterization）</h2>
                 <p>光栅化是自 1990 年代起就广泛使用的传统渲染方式，也是目前大多数游戏默认的渲染管线。它的核心思想是：将 3D 场景投影到 2D 屏幕上，逐像素确定颜色。</p>
@@ -57,20 +60,22 @@
                 <p>在顶点处理阶段，每个顶点需要经过一系列矩阵变换：</p>
                 <div class="formula">
                     <strong>顶点变换公式：</strong><br>
-                    P_view = M_view · P_model<br>
-                    P_clip = M_proj · P_view<br>
+                    \[P_{view} = M_{view} \cdot P_{model}\]<br>
+                    \[P_{clip} = M_{proj} \cdot P_{view}\]<br>
                     <br>
-                    其中 M_view 是视图矩阵，M_proj 是投影矩阵。通过这两个矩阵，一个 3D 点 P_model 被变换到齐次裁剪空间。
+                    其中 \(M_{view}\) 是视图矩阵，\(M_{proj}\) 是投影矩阵。通过这两个矩阵，一个 3D 点 \(P_{model}\) 被变换到齐次裁剪空间。
                 </div>
                 <p>最终，裁剪空间中的顶点经过透视除法得到归一化设备坐标（NDC），再映射到屏幕像素坐标。</p>
 
                 <h3>1.3 光栅化原理：扫描线算法</h3>
                 <p>光栅化的核心是确定每个三角形覆盖了哪些像素。最常用的方法是<strong>扫描线算法</strong>。对于屏幕上的每个水平扫描线，计算它与三角形的相交区间，然后填充区间内的像素。</p>
-                <img src="Image/扫描线算法示意图.jpg" alt="扫描线算法示意图" class="blog-image">
+                <img src="Image/扫描线算法示意图.jpg" alt="扫描线算法示意图" class="blog-image image-rasterization">
+                <p class="image-notice">图片来源于网络，如有侵权请联系作者删除。</p>
 
                 <h3>1.4 GPU 并行架构</h3>
                 <p>GPU 之所以能高效处理光栅化，得益于其<strong>大规模并行架构</strong>。一块主流显卡可能拥有数千个流处理器（Stream Processors），每个处理器可以同时处理一个像素的计算。这意味着整个屏幕的百万级像素可以被"同时"计算，大幅缩短了总处理时间。</p>
                 <img src="Image/GPU并行示意图.png" alt="GPU并行示意图" class="blog-image">
+                <p class="image-notice">图片来源于网络，如有侵权请联系作者删除。</p>
 
                 <h2 id="section2">2. 光线追踪（Ray Tracing）</h2>
                 <p>光线追踪的灵感来自对现实世界中光线行为的模拟。在现实中，光从光源发出，经过多次反射、折射后进入我们的眼睛。光线追踪正是逆向计算这一过程：从屏幕每个像素出发，向场景中发射光线，追踪它与物体相交后的反射、折射路径，最终计算像素颜色。</p>
@@ -79,36 +84,36 @@
                 <p>光线的数学表示十分简洁。设 O 为光线起点（摄影机位置），d 为光线方向（归一化向量），则沿光线方向任意一点 P 的位置为：</p>
                 <div class="formula">
                     <strong>光线参数方程：</strong><br>
-                    P(t) = O + t · d, &nbsp;&nbsp; t ≥ 0
+                    \[P(t) = O + t \cdot d, \quad t \geq 0\]
                 </div>
                 <p>其中 t 表示从 O 出发沿方向 d 的距离。这是一个简单的一维线性方程，后续计算光线与物体交点都基于此方程。</p>
 
                 <h3>2.2 光线与球体求交</h3>
                 <p>光线与物体求交是光线追踪最基本的计算。假设球体中心为 C，半径为 r。球体的隐式方程为：</p>
                 <div class="formula">
-                    |P - C|² - r² = 0
+                    \[|P - C|^2 - r^2 = 0\]
                 </div>
-                <p>将 P = O + t·d 代入球体方程，整理后得到关于 t 的二次方程：</p>
+                <p>将 \(P = O + t \cdot d\) 代入球体方程，整理后得到关于 t 的二次方程：</p>
                 <div class="formula">
-                    (d·d)t² + 2(d·(O-C))t + |O-C|² - r² = 0
+                    \[(d \cdot d)t^2 + 2(d \cdot (O-C))t + |O-C|^2 - r^2 = 0\]
                 </div>
                 <p>解这个二次方程：</p>
                 <ul>
-                    <li>判别式 Δ = (d·(O-C))² - |d|²(|O-C|² - r²)</li>
-                    <li>若 Δ < 0：无交点</li>
-                    <li>若 Δ ≥ 0：取较小的非负根作为交点距离 t</li>
+                    <li>判别式 \(\Delta = (d \cdot (O-C))^2 - |d|^2(|O-C|^2 - r^2)\)</li>
+                    <li>若 \(\Delta < 0\)：无交点</li>
+                    <li>若 \(\Delta \geq 0\)：取较小的非负根作为交点距离 t</li>
                 </ul>
                 <p>光线与球体求交的几何意义是：求解光线与球面方程的交点。当光线穿越球体时，会在入口和出口处各产生一个交点，取距离较近的入口点作为实际交点。</p>
 
                 <h3>2.3 光线与三角形求交</h3>
                 <p>实际场景中更多使用三角形面片。光线和三角形 ABC 求交的步骤：</p>
                 <ol>
-                    <li>计算光线与三角形所在平面的交点（平面方程：n·P + D = 0）</li>
+                    <li>计算光线与三角形所在平面的交点（平面方程：\(n \cdot P + D = 0\)）</li>
                     <li>判断交点是否在三角形内部（使用重心坐标）</li>
                 </ol>
                 <div class="formula">
                     <strong>重心坐标 (u, v, w)：</strong><br>
-                    P = u·A + v·B + w·C, &nbsp;&nbsp; u + v + w = 1<br>
+                    \[P = u \cdot A + v \cdot B + w \cdot C, \quad u + v + w = 1\]<br>
                     <br>
                     若 u, v, w 均在 [0, 1] 区间内，则交点在三角形内。
                 </div>
@@ -139,16 +144,17 @@
                 <p>其中 <strong>reflect</strong> 和 <strong>refract</strong> 是关键的向量运算：</p>
                 <div class="formula">
                     <strong>反射公式：</strong><br>
-                    r = d - 2(d·n)n<br>
+                    \[r = d - 2(d \cdot n)n\]<br>
                     <br>
                     <strong>折射公式（Snell 定律）：</strong><br>
-                    η₁ sin(θ₁) = η₂ sin(θ₂)<br>
-                    t = (η₁/η₂)d - n·((η₁/η₂)cos(θ₁) - cos(θ₂))
+                    \[\eta_1 \sin(\theta_1) = \eta_2 \sin(\theta_2)\]<br>
+                    \[t = (\eta_1/\eta_2)d - n \cdot ((\eta_1/\eta_2)\cos(\theta_1) - \cos(\theta_2))\]
                 </div>
 
                 <h3>2.5 BVH 加速结构</h3>
                 <p>直接对场景中每个物体测试光线求交，计算复杂度为 O(N)。为加速这一过程，通常使用 <strong>BVH（Bounding Volume Hierarchy）</strong>——用层次化的包围盒跳过不必要的求交测试。</p>
-                <img src="Image/BVH树.jpg" alt="BVH加速结构示意图" class="blog-image">
+                <img src="Image/BVH树.jpg" alt="BVH加速结构示意图" class="blog-image image-bvh">
+                <p class="image-notice">图片来源于网络，如有侵权请联系作者删除。</p>
                 <p>BVH 将场景物体组织成树结构：根节点包围整个场景，叶节点是单个物体。求交时从根节点开始，如果光线与某包围盒无交，则跳过该节点下的所有子节点。平均可将复杂度降至 O(log N)。</p>
 
                 <h2 id="section3">3. 路径追踪与俄罗斯轮盘赌</h2>
@@ -159,21 +165,19 @@
                 <p>对于每个像素，路径追踪的采样公式为：</p>
                 <div class="formula">
                     <strong>光照贡献公式：</strong><br>
-                    L_o(p, ω_o) = ∫_Ω f_r(p, ω_i, ω_o) L_i(p, ω_i) cos(θ_i) dω_i<br>
+                    \[L_o(p, \omega_o) = \int_{\Omega} f_r(p, \omega_i, \omega_o) L_i(p, \omega_i) \cos(\theta_i) d\omega_i\]<br>
                     <br>
-                    其中 f_r 是双向反射分布函数（BRDF），L_i 是入射光照，cos(θ_i) 是入射角因子。<br>
+                    其中 \(f_r\) 是双向反射分布函数（BRDF），\(L_i\) 是入射光照，\(\cos(\theta_i)\) 是入射角因子。<br>
                     <br>
                     由于积分无法解析求解，我们用蒙特卡罗方法估计：<br>
-                    L ≈ (1/N) Σ (f_r · L_i · cos(θ) / p(ω))
+                    \[L \approx \frac{1}{N} \sum \frac{f_r \cdot L_i \cdot \cos(\theta)}{p(\omega)}\]
                 </div>
-                <p>这里的 p(ω) 是采样概率分布。通过多次采样平均，最终结果会收敛到真实的光照值。采样次数 N 越大，噪声越小，画面越平滑。</p>
+                <p>这里的 \(p(\omega)\) 是采样概率分布。通过多次采样平均，最终结果会收敛到真实的光照值。采样次数 N 越大，噪声越小，画面越平滑。</p>
 
                 <h3>3.2 俄罗斯轮盘赌（Russian Roulette）</h3>
                 <p>在路径追踪中，光线可以无限弹射（光线在光滑表面会不断反射永不终止）。为避免无限循环，我们需要在某个深度终止递归。但简单的深度截断会引入偏差——因为它系统性地遗漏了长路径的光线贡献。</p>
-                <p><strong>俄罗斯轮盘赌</strong>是一种无偏的终止策略：每当光线追踪到一定深度时，以某个概率 p 决定是否继续追踪。如果终止，则返回一个启发式估计值；如果继续，则对光线进行加权补偿，使得终止与非终止情况的期望值一致。</p>
-                <div class="formula">
-                    <strong>俄罗斯轮盘赌算法：</strong><br>
-                    <br>
+                <p><strong>俄罗斯轮盘赌</strong>是一种无偏的终止策略：每当光线追踪到一定深度时，以某个概率 \(p_{terminate}\) 决定是否继续追踪。如果终止，则返回一个启发式估计值；如果继续，则对光线进行加权补偿，使得终止与非终止情况的期望值一致。</p>
+                <div class="formula" style="font-family: monospace; background-color: #f5f5f5; padding: 15px;">
                     <strong>RussianRoulette(depth, p_terminate):</strong><br>
                     &nbsp;&nbsp;if depth > MIN_DEPTH:<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;if random() < p_terminate:<br>
@@ -184,10 +188,10 @@
                     &nbsp;&nbsp;else:<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;return TraceRay()<br>
                     <br>
-                    终止概率 p_terminate 通常取 0.3-0.5。<br>
+                    其中 p_terminate 通常取 0.3-0.5，<br>
                     ESTIMATED_INDIRECT_LIGHT 可以是环境光平均值或 0。
                 </div>
-                <p>俄罗斯轮盘赌的关键是<strong>加权补偿</strong>：当光线被终止时，我们不返回 0，而是返回一个合理的估计值；当光线继续追踪时，我们用 (1 - p_terminate) 的倒数作为权重放大最终结果。这保证了无论光线是否终止，最终期望值都等于真实值，从而实现无偏估计。</p>
+                <p>俄罗斯轮盘赌的关键是<strong>加权补偿</strong>：当光线被终止时，我们不返回 0，而是返回一个合理的估计值；当光线继续追踪时，我们用 \((1 - p_{terminate})\) 的倒数作为权重放大最终结果。这保证了无论光线是否终止，最终期望值都等于真实值，从而实现无偏估计。</p>
 
                 <h2 id="section4">4. 性能对比：为何开光追会卡顿？</h2>
                 <p>了解了两种渲染方式后，我们来分析为什么开启光线追踪后电脑会变卡。</p>
@@ -202,13 +206,13 @@
                 <p>以 1920×1080 分辨率为例：</p>
                 <div class="formula">
                     <strong>光栅化计算量：</strong><br>
-                    1920 × 1080 = 2,073,600 次独立像素计算<br>
+                    \[1920 \times 1080 = 2,073,600\] 次独立像素计算<br>
                     <br>
                     <strong>光线追踪计算量（粗略估计）：</strong><br>
                     像素数：2,073,600<br>
                     每像素光线数：4（1 主光线 + 1 反射 + 1 阴影 + 1 环境光）<br>
                     平均弹射次数：6<br>
-                    总求交次数：2,073,600 × 4 × 6 = 49,766,400 次<br>
+                    总求交次数：\(2,073,600 \times 4 \times 6 = 49,766,400\) 次<br>
                     <br>
                     每次求交需解二次方程（光线-球体）或重心坐标计算（光线-三角形）
                 </div>
@@ -235,6 +239,7 @@
                 <p><strong>路径追踪</strong>通过蒙特卡罗采样和大数定律，将随机性的光线传播问题转化为可计算的积分估计；而<strong>俄罗斯轮盘赌</strong>则提供了一种无偏的无限弹射终止策略。</p>
                 <p>然而，光线追踪巨大的计算量仍是实时的挑战。每个像素需要追踪多条弹跳光线，而每条光线都需要与场景几何进行求交测试，这种指数级增长是光追卡顿的根本原因。</p>
                 <p>目前游戏采用的光栅+光追混合方案是在效果与性能间的折中。随着硬件算力提升和 AI 降噪技术发展，我们有理由相信，未来光线追踪将成为游戏渲染的默认方式。</p>
+                <p class="image-notice">图片来源于网络，如有侵权请联系作者删除。</p>
             </div>
 
             <div class="card nav-blog">
