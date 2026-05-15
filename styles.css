@@ -227,6 +227,25 @@ header.blog-hero h1 {
     margin-bottom: 8px;
 }
 
+.blog-content .card .formula {
+    background-color: #f8f9fa;
+    border-left: 4px solid #667eea;
+    padding: 15px 20px;
+    margin: 20px 0;
+    font-family: "Times New Roman", serif;
+    line-height: 1.8;
+}
+
+.blog-content .card .formula strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #667eea;
+}
+
+.image-placeholder {
+    border-radius: 8px;
+}
+
 footer.footer {
     text-align: center;
     padding: 40px;

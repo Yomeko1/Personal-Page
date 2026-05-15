@@ -43,60 +43,166 @@
                     <li><strong>深度测试与混合</strong>：决定像素的可见性并合成最终画面</li>
                 </ul>
 
-                <h3>1.2 为什么光栅化快？</h3>
-                <p>GPU 之所以能高效处理光栅化，得益于其<strong>大规模并行架构</strong>。一块主流显卡可能拥有数千个流处理器，每个处理器可以同时处理一个像素的计算。这意味着整个屏幕的百万级像素可以被"同时"计算，大幅缩短了总处理时间。</p>
-                <p>此外，光栅化充分利用了<strong>空间连贯性</strong>：相邻像素往往属于同一个三角形，它们可以共享顶点和着色计算结果，避免重复工作。</p>
+                <h3>1.2 顶点变换与投影矩阵</h3>
+                <p>在顶点处理阶段，每个顶点需要经过一系列矩阵变换：</p>
+                <div class="formula">
+                    <strong>顶点变换公式：</strong><br>
+                    P_view = M_view · P_model<br>
+                    P_clip = M_proj · P_view<br>
+                    <br>
+                    其中 M_view 是视图矩阵，M_proj 是投影矩阵。通过这两个矩阵，一个 3D 点 P_model 被变换到齐次裁剪空间。
+                </div>
+                <p>最终，裁剪空间中的顶点经过透视除法得到归一化设备坐标（NDC），再映射到屏幕像素坐标。</p>
+
+                <h3>1.3 光栅化原理：扫描线算法</h3>
+                <p>光栅化的核心是确定每个三角形覆盖了哪些像素。最常用的方法是<strong>扫描线算法</strong>。对于屏幕上的每个水平扫描线，计算它与三角形的相交区间，然后填充区间内的像素。</p>
+                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
+                    <p style="color: #666;">[示意图：扫描线光栅化过程，三角形被分解为水平像素行]</p>
+                </div>
+
+                <h3>1.4 GPU 并行架构</h3>
+                <p>GPU 之所以能高效处理光栅化，得益于其<strong>大规模并行架构</strong>。一块主流显卡可能拥有数千个流处理器（Stream Processors），每个处理器可以同时处理一个像素的计算。这意味着整个屏幕的百万级像素可以被"同时"计算，大幅缩短了总处理时间。</p>
+                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
+                    <p style="color: #666;">[示意图：GPU 并行处理示意，数千个核心同时计算不同像素]</p>
+                </div>
 
                 <h2>2. 光线追踪（Ray Tracing）</h2>
                 <p>光线追踪的灵感来自对现实世界中光线行为的模拟。在现实中，光从光源发出，经过多次反射、折射后进入我们的眼睛。光线追踪正是逆向计算这一过程：从屏幕每个像素出发，向场景中发射光线，追踪它与物体相交后的反射、折射路径，最终计算像素颜色。</p>
 
-                <h3>2.1 核心算法原理</h3>
-                <p>对于屏幕上的每个像素，光线追踪执行以下步骤：</p>
-                <ol>
-                    <li>从摄影机位置向该像素方向发射一条光线</li>
-                    <li>检查光线与场景中所有物体的交点，找出最近的交点</li>
-                    <li>在该交点处，根据材质属性计算反射/折射方向</li>
-                    <li>沿新方向继续发射光线，重复上述过程</li>
-                    <li>当光线到达光源或达到最大追踪次数时，停止计算并回溯累加颜色</li>
-                </ol>
+                <h3>2.1 光线方程</h3>
+                <p>光线的数学表示十分简洁。设 O 为光线起点（摄影机位置），d 为光线方向（归一化向量），则沿光线方向任意一点 P 的位置为：</p>
+                <div class="formula">
+                    <strong>光线参数方程：</strong><br>
+                    P(t) = O + t · d, &nbsp;&nbsp; t ≥ 0
+                </div>
+                <p>其中 t 表示从 O 出发沿方向 d 的距离。这是一个简单的一维线性方程，后续计算光线与物体交点都基于此方程。</p>
 
-                <h3>2.2 光线追踪能实现的效果</h3>
-                <p>光线追踪能够自然地实现传统光栅化难以模拟的效果：</p>
+                <h3>2.2 光线与球体求交</h3>
+                <p>光线与物体求交是光线追踪最基本的计算。假设球体中心为 C，半径为 r。球体的隐式方程为：</p>
+                <div class="formula">
+                    |P - C|² - r² = 0
+                </div>
+                <p>将 P = O + t·d 代入球体方程，整理后得到关于 t 的二次方程：</p>
+                <div class="formula">
+                    (d·d)t² + 2(d·(O-C))t + |O-C|² - r² = 0
+                </div>
+                <p>解这个二次方程：</p>
                 <ul>
-                    <li><strong>真实反射</strong>：水面、镜子、金属表面能准确倒映周围环境，且倒影中能包含其他物体的反射</li>
-                    <li><strong>柔和阴影</strong>：根据光源大小计算阴影软硬程度，而非简单的二值阴影</li>
-                    <li><strong>全局光照</strong>：光线不仅来自直接光源，还包括物体间光线反射产生的间接照亮</li>
-                    <li><strong>透明折射</strong>：玻璃、水晶等透明材质的光线偏折效果</li>
+                    <li>判别式 Δ = (d·(O-C))² - |d|²(|O-C|² - r²)</li>
+                    <li>若 Δ < 0：无交点</li>
+                    <li>若 Δ ≥ 0：取较小的非负根作为交点距离 t</li>
                 </ul>
+                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
+                    <p style="color: #666;">[示意图：光线与球体求交，交点处可计算法线、反射方向等]</p>
+                </div>
+
+                <h3>2.3 光线与三角形求交</h3>
+                <p>实际场景中更多使用三角形面片。光线和三角形 ABC 求交的步骤：</p>
+                <ol>
+                    <li>计算光线与三角形所在平面的交点（平面方程：n·P + D = 0）</li>
+                    <li>判断交点是否在三角形内部（使用重心坐标）</li>
+                </ol>
+                <div class="formula">
+                    <strong>重心坐标 (u, v, w)：</strong><br>
+                    P = u·A + v·B + w·C, &nbsp;&nbsp; u + v + w = 1<br>
+                    <br>
+                    若 u, v, w 均在 [0, 1] 区间内，则交点在三角形内。
+                </div>
+
+                <h3>2.4 递归光线追踪算法</h3>
+                <p>光线追踪的核心是递归地追踪光线的反射和折射路径。算法伪代码如下：</p>
+                <div class="formula" style="font-family: monospace; background-color: #f5f5f5; padding: 15px;">
+                    <strong>TraceRay(O, d, depth):</strong><br>
+                    &nbsp;&nbsp;if depth == 0: return BLACK<br>
+                    &nbsp;&nbsp;hit = nearest intersection with scene<br>
+                    &nbsp;&nbsp;if no hit: return SKY_COLOR<br>
+                    &nbsp;&nbsp;<br>
+                    &nbsp;&nbsp;P = O + t·d<br>
+                    &nbsp;&nbsp;n = surface normal at P<br>
+                    &nbsp;&nbsp;<br>
+                    &nbsp;&nbsp;color = shade material at P<br>
+                    &nbsp;&nbsp;<br>
+                    &nbsp;&nbsp;if material is reflective:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;r = reflect(d, n)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;color += TraceRay(P, r, depth-1)<br>
+                    &nbsp;&nbsp;<br>
+                    &nbsp;&nbsp;if material is transparent:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;t = refract(d, n)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;color += TraceRay(P, t, depth-1)<br>
+                    &nbsp;&nbsp;<br>
+                    &nbsp;&nbsp;return color
+                </div>
+                <p>其中 <strong>reflect</strong> 和 <strong>refract</strong> 是关键的向量运算：</p>
+                <div class="formula">
+                    <strong>反射公式：</strong><br>
+                    r = d - 2(d·n)n<br>
+                    <br>
+                    <strong>折射公式（Snell 定律）：</strong><br>
+                    η₁ sin(θ₁) = η₂ sin(θ₂)<br>
+                    t = (η₁/η₂)d - n·((η₁/η₂)cos(θ₁) - cos(θ₂))
+                </div>
+                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
+                    <p style="color: #666;">[示意图：光线在镜面反射，左为入射光线，右为反射光线]</p>
+                </div>
+
+                <h3>2.5 BVH 加速结构</h3>
+                <p>直接对场景中每个物体测试光线求交，计算复杂度为 O(N)。为加速这一过程，通常使用 <strong>BVH（Bounding Volume Hierarchy）</strong>——用层次化的包围盒跳过不必要的求交测试。</p>
+                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
+                    <p style="color: #666;">[示意图：BVH 树结构，复杂模型被层次化包围盒包裹]</p>
+                </div>
+                <p>BVH 将场景物体组织成树结构：根节点包围整个场景，叶节点是单个物体。求交时从根节点开始，如果光线与某包围盒无交，则跳过该节点下的所有子节点。平均可将复杂度降至 O(log N)。</p>
 
                 <h2>3. 性能对比：为何开光追会卡顿？</h2>
                 <p>了解了两种渲染方式后，我们来分析为什么开启光线追踪后电脑会变卡。</p>
 
-                <h3>3.1 计算量差异</h3>
+                <h3>3.1 计算量分析</h3>
                 <p>光栅化每个像素的计算是<strong>独立的、固定流程的</strong>，GPU 可以批量并行处理。而光线追踪的计算量是<strong>动态且递归的</strong>：</p>
                 <ul>
-                    <li>每个像素需要发射多条光线（至少一条主光线，加上反射、阴影等辅助光线）</li>
-                    <li>每条光线需要与场景中所有物体进行求交测试（BVH 等加速结构可以优化，但计算量仍巨大）</li>
+                    <li>每个像素需要发射多条光线（主光线 + 反射光 + 阴影光）</li>
+                    <li>每条光线需要与场景物体进行求交测试（BVH 可优化，但计算量仍巨大）</li>
                     <li>光线可能在场景中弹射多次（5-10 次甚至更多），呈指数级增长</li>
                 </ul>
-                <p>以 1920×1080 分辨率为例，屏幕有约 200 万像素。如果每个像素追踪 4 条光线，每条光线平均弹射 5 次，则需要计算 200万 × 4 × 5 = 4000 万次光线-物体求交。而求交计算涉及复杂的数学运算（光线方程与三角形方程的联立求解）。</p>
+                <p>以 1920×1080 分辨率为例：</p>
+                <div class="formula">
+                    <strong>光栅化计算量：</strong><br>
+                    1920 × 1080 = 2,073,600 次独立像素计算<br>
+                    <br>
+                    <strong>光线追踪计算量（粗略估计）：</strong><br>
+                    像素数：2,073,600<br>
+                    每像素光线数：4（1 主光线 + 1 反射 + 1 阴影 + 1 环境光）<br>
+                    平均弹射次数：6<br>
+                    总求交次数：2,073,600 × 4 × 6 = 49,766,400 次<br>
+                    <br>
+                    每次求交需解二次方程（光线-球体）或重心坐标计算（光线-三角形）
+                </div>
+                <p>这还没有考虑每个物体包含数万三角形的复杂场景。</p>
 
-                <h3>3.2 硬件瓶颈</h3>
-                <p>光栅化可以充分利用 GPU 的并行特性，但光线追踪对<strong>内存带宽</strong>和<strong>缓存命中率</strong>要求极高。因为每次求交测试都需要访问场景物体的几何数据，而这些数据很难像光栅化那样预加载到高速缓存中。</p>
-                <p>这就是为什么即使是最新的高端显卡，在开启完整光线追踪后仍可能出现明显帧率下降。</p>
+                <h3>3.2 光线追踪的瓶颈</h3>
+                <p>光栅化可以充分利用 GPU 的并行特性，但光线追踪存在两个主要瓶颈：</p>
+                <ol>
+                    <li><strong>内存带宽瓶颈</strong>：每次求交测试需要读取场景几何数据（三角形顶点、材质信息），而 GPU 缓存难以有效预取这些数据，导致内存访问延迟成为瓶颈</li>
+                    <li><strong>分支不确定性</strong>：不同像素追踪的光线数不同（遇到反射材质继续追踪，遇到吸收材质停止），导致 GPU 流处理器执行路径不一致，难以高效并行</li>
+                </ol>
+                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
+                    <p style="color: #666;">[示意图：光追计算量随弹射次数指数增长示意图]</p>
+                </div>
 
                 <h2>4. 现代游戏的混合方案</h2>
                 <p>既然光线追踪这么好，为什么不全程使用？因为完整光线追踪的计算量对于实时渲染（每秒 60 帧）来说仍然过大。目前主流的做法是<strong>混合渲染</strong>：</p>
                 <ul>
                     <li><strong>光栅化作为基础</strong>：用光栅化渲染大部分画面，保证基本帧率</li>
                     <li><strong>有限光线追踪增强</strong>：只对特定效果（如镜面反射、软阴影）使用光追</li>
-                    <li><strong>AI 降噪</strong>：用深度学习网络从少量光线样本生成高质量画面，大幅减少所需光线数量</li>
+                    <li><strong>降噪算法</strong>：每像素只投射少量光线（如 1-2 条），用 AI 降噪从少样本生成高质量结果</li>
                 </ul>
-                <p>例如 NVIDIA 的 DLSS 技术就是通过 AI 降噪，在保证画质的前提下将光追性能提升数倍。</p>
+                <p>例如 NVIDIA 的 <strong>DLSS</strong>（Deep Learning Super Sampling）技术：先以较低分辨率（如 720p）渲染，再用 AI 网络重建为高分辨率（如 1080p）画面，同时执行降噪处理。这使得光追性能提升 2-4 倍。</p>
+                <div class="image-placeholder" style="background-color: #f0f0f0; padding: 40px; text-align: center; border: 2px dashed #ccc; margin: 20px 0;">
+                    <p style="color: #666;">[对比图：左侧关闭光追的光栅化画面，右侧开启光追+DLSS的画面]</p>
+                </div>
 
                 <h2>5. 总结</h2>
-                <p>光线追踪代表了计算机图形学的未来，它能带来更加逼真的画面效果。但其巨大的计算量仍是实时的挑战。目前游戏采用的光栅+光追混合方案是在效果与性能间的折中。随着硬件算力提升和 AI 技术发展，我们有理由相信，未来光线追踪将成为游戏渲染的默认方式。</p>
-                <p>回到开头的问题：开了光线追踪后电脑卡顿，是因为你的显卡正在执行远超光栅化的计算量。那些漂亮的光影效果，都是用宝贵的帧率换来的。</p>
+                <p>光线追踪代表了计算机图形学的未来，它能带来更加逼真的画面效果。其背后的数学原理——光线参数方程、球体求交的二次方程、反射与折射公式——构成了这套渲染范式的理论基础。</p>
+                <p>然而，光线追踪巨大的计算量仍是实时的挑战。每个像素需要追踪多条弹跳光线，而每条光线都需要与场景几何进行求交测试，这种指数级增长是光追卡顿的根本原因。</p>
+                <p>目前游戏采用的光栅+光追混合方案是在效果与性能间的折中。随着硬件算力提升和 AI 降噪技术发展，我们有理由相信，未来光线追踪将成为游戏渲染的默认方式。</p>
             </div>
 
             <div class="card nav-blog">
