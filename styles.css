@@ -101,6 +101,21 @@ nav.navigation {
     margin-bottom: 10px;
 }
 
+.project-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.project-item h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.project-item p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
 .interest-list {
     list-style: none;
     display: grid;
