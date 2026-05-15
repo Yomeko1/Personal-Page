@@ -103,17 +103,23 @@ nav.navigation {
 
 .project-item {
     text-align: center;
-    padding: 20px;
+    padding: 15px;
 }
 
 .project-item h3 {
     font-size: 1.3rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .project-item p {
     color: #666;
     margin-bottom: 15px;
+}
+
+.project-item .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .interest-list {
