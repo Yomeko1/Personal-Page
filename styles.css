@@ -234,6 +234,7 @@ header.blog-hero h1 {
     margin: 20px 0;
     font-family: "Times New Roman", serif;
     line-height: 1.8;
+    overflow-x: auto;
 }
 
 .blog-content .card .formula strong {
@@ -283,6 +284,13 @@ header.blog-hero h1 {
 .image-bvh {
     max-width: 400px;
     height: auto;
+}
+
+@media (max-width: 480px) {
+    .image-rasterization,
+    .image-bvh {
+        max-width: 100%;
+    }
 }
 
 .image-notice {
@@ -348,5 +356,37 @@ footer.footer {
 
     .interest-list {
         grid-template-columns: 1fr;
+    }
+
+    .blog-image {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .blog-content .card {
+        padding: 15px;
+    }
+
+    .blog-content .card .formula {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+
+    .blog-content .card h2 {
+        font-size: 1.3rem;
+    }
+
+    .blog-content .card h3 {
+        font-size: 1.1rem;
+    }
+
+    .blog-content .card p {
+        line-height: 1.6;
+        word-wrap: break-word;
+    }
+
+    .blog-content .card ul,
+    .blog-content .card ol {
+        padding-left: 20px;
     }
 }
