@@ -13,9 +13,9 @@
     urlcolor=blue
 }
 
-\title{算法基础大作业报告}
-\author{田天威}
-\date{2026年5月}
+\title{个人主页搭建报告}
+\author{田天威 PB23010364}
+\date{}
 
 \begin{document}
 
@@ -29,10 +29,10 @@
 \subsection{主页的主要内容}
 个人主页包含以下内容：
 \begin{itemize}
-    \item \textbf{个人简介}：包含姓名（田天威）、学校与专业方向（USTC | C/C++ | Python | 信息与计算科学）
-    \item \textbf{关于我}：介绍个人背景、兴趣爱好及学习方向
+    \item \textbf{标签}：包含姓名、学校与专业方向（USTC | C/C++ | Python | 信息与计算科学）
+    \item \textbf{个人简介}：介绍个人背景、兴趣爱好及学习方向
     \item \textbf{研究方向与兴趣}：涵盖信息与计算科学、计算机图形学、人工智能等领域
-    \item \textbf{学习笔记}：提供微分几何学习笔记的 PDF 下载
+    \item \textbf{学习笔记}：提供微分几何学习笔记的 PDF 
     \item \textbf{项目展示}：预留项目展示区域（目前为 "coming soon"）
     \item \textbf{博客入口}：提供进入技术博客的跳转链接
 \end{itemize}
@@ -50,7 +50,7 @@
 博文标题为《从光栅到光追：游戏显卡的算力消耗解析》。
 
 \subsection{主要内容概述}
-博客从游戏设置中的"光线追踪"选项出发，系统性地介绍了以下内容：
+博客从游戏设置中的“光线追踪”选项出发，系统性地介绍了以下内容：
 
 \begin{itemize}
     \item \textbf{光栅化渲染（Rasterization）}：传统渲染方式的原理与 GPU 并行架构
@@ -60,7 +60,7 @@
     \item \textbf{现代游戏混合方案}：光栅化 + 有限光追 + AI 降噪的工程实践
 \end{itemize}
 
-博客中包含了详细的数学公式推导（如光线参数方程 \(P(t) = O + t \cdot d\)、球体求交的二次方程、反射与折射公式等），并配有扫描线算法和 BVH 加速结构的示意图。
+博客中包含了详细的数学公式推导（如光线参数方程 \(P(t) = O + t \cdot d\)、球体求交的二次方程、反射与折射公式等），并配有部分示意图。
 
 \subsection{博客访问方式}
 博客可通过个人主页顶部的"博客"导航栏进入，访问链接为：\url{https://Yomeko1.github.io/Personal-Page/blog.html}
@@ -86,9 +86,8 @@
 \begin{enumerate}
     \item \textbf{项目初始化}：创建本地 Git 仓库，初始化项目结构
     \item \textbf{页面开发}：编写 index.html（主页）、blog.html（博客列表）、blog-ray-tracing.html（博客正文）以及 styles.css（样式文件）
-    \item \textbf{内容填充}：根据"主页内容.txt"中的信息填充个人资料，包括姓名、学校、兴趣方向等
-    \item \textbf{头像设置}：将头像图片放入 Image 文件夹，修改 HTML 中的图片路径
-    \item \textbf{学习笔记集成}：将微分几何学习笔记（main.pdf）链接到主页项目展示区
+    \item \textbf{内容填充}：填充个人资料，包括头像、姓名、学校、兴趣方向等
+    \item \textbf{笔记与项目集成}：将微分几何学习笔记（main.pdf）链接到主页笔记展示区，项目展示区暂定 Coming Soon
     \item \textbf{提交与推送}：使用 Git 提交代码，通过 \texttt{git push} 推送到 GitHub 远程仓库
     \item \textbf{GitHub Pages 配置}：在 GitHub 仓库 Settings 中启用 Pages 功能，选择 master 分支作为部署源
 \end{enumerate}
@@ -98,7 +97,6 @@
 \begin{itemize}
     \item \textbf{网络连接问题}：在推送代码至 GitHub 时遇到网络连接失败，经过多次重试后成功推送
     \item \textbf{图片路径问题}：初始头像路径使用本地文件名，后统一将图片资源移至 Image 文件夹，修改 HTML 中的相对路径
-    \item \textbf{图片格式问题}：GPU 并行示意图原为 PNG 格式，在网页中无法正常显示，后转换为 JPG 格式解决
     \item \textbf{图片显示尺寸问题}：部分图片（扫描线算法、BVH 树）显示尺寸过大，通过 CSS 设置 \texttt{max-width} 属性限制最大宽度
 \end{itemize}
 
@@ -110,8 +108,7 @@
 \subsection{AI 辅助完成的内容}
 
 \begin{itemize}
-    \item \textbf{网页框架搭建}：AI 辅助生成了主页、博客列表页、博客内容页的基本 HTML 结构与 CSS 样式
-    \item \textbf{内容填充与修改}：根据用户提供的"主页内容.txt"，AI 辅助完成了个人信息、头像、研究方向等内容的修改
+    \item \textbf{网页框架搭建}：AI 辅助生成了主页、博客列表页、博客内容页的基本 HTML 结构与 CSS 样式，并完成了基本信息的占位。
     \item \textbf{博客内容撰写}：AI 辅助撰写了光线追踪技术博客，包括数学公式（如光线参数方程、球体求交公式、路径追踪积分等）和算法伪代码（递归光线追踪、俄罗斯轮盘赌）
     \item \textbf{技术细节补充}：AI 补充了路径追踪的蒙特卡罗采样方法、俄罗斯轮盘赌的无偏终止策略等技术内容
     \item \textbf{图片与排版优化}：AI 协助调整图片显示尺寸、添加图片版权声明、配置 MathJax 公式渲染
@@ -120,9 +117,9 @@
 \subsection{自己对 AI 生成内容做的修改}
 
 \begin{itemize}
-    \item \textbf{内容个性化}：AI 生成的初始内容中的人物名称（张三）被替换为真实姓名（田天威），简介文字也根据个人实际情况进行了修改
-    \item \textbf{主题选择}：博客主题从最初的线性代数调整为计算机图形学中的光线追踪内容，更符合个人兴趣与研究方向
-    \item \textbf{图片替换}：删除了 AI 生成的线性代数博客，替换为光线追踪专题文章，并增补了路径追踪与俄罗斯轮盘赌的内容
+    \item \textbf{内容个性化}：将 AI 生成的初始内容中的占位信息替换为个人真实信息，简介文字也根据个人实际情况进行了修改
+    \item \textbf{主题选择}：博客主题从最初的数学主题调整为计算机图形学中的光线追踪内容，更符合个人兴趣与研究方向
+    \item \textbf{修改内容}：增加了个人的学习笔记，并对博客内容进行了一部分修改
     \item \textbf{细节调整}：对 AI 生成的公式表述、代码注释进行了检查与微调，确保数学公式的正确性与文字表达的流畅性
 \end{itemize}
 
