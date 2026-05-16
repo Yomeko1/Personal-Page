@@ -98,6 +98,7 @@
     \item \textbf{网络连接问题}：在推送代码至 GitHub 时遇到网络连接失败，经过多次重试后成功推送
     \item \textbf{图片路径问题}：初始头像路径使用本地文件名，后统一将图片资源移至 Image 文件夹，修改 HTML 中的相对路径
     \item \textbf{图片显示尺寸问题}：部分图片（扫描线算法、BVH 树）显示尺寸过大，通过 CSS 设置 \texttt{max-width} 属性限制最大宽度
+    \item \textbf{跨客户端显示不一致问题}：网页在手机端存在图片、公式超出边界的情况，通过添加响应式 CSS 规则（如 \texttt{overflow-x: auto}）使页面在桌面端和移动端均能正常显示
 \end{itemize}
 
 \section{AI Agent 使用说明}
