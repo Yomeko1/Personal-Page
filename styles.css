@@ -228,12 +228,11 @@ header.blog-hero h1 {
     word-wrap: break-word;
 }
 
-.blog-content mjx-container,
-.blog-content mjx-row,
-.blog-content mjx-itable {
+.blog-content mjx-container[display="true"] {
     overflow-x: auto !important;
     max-width: 100% !important;
     display: block !important;
+    text-align: center !important;
 }
 
 .blog-content .card .formula {
